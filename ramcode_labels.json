@@ -1,0 +1,8 @@
+[
+    { "name":"@sector_start", "logical":"0804", "page": "00"},
+    { "name":"@header", "logical":"081d", "page": "00"},
+    { "name":"@read_sector_infos", "logical":"0822", "page": "00"},
+    { "name":"@wait_0", "logical":"0864", "page": "00"},
+    { "name":"@data", "logical":"0992", "page": "00"},
+    { "name":"crc", "logical":"0a0c", "page": "00"}
+]
