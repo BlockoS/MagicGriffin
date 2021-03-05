@@ -5,43 +5,7 @@
         "page": "0",
         "logical": "0800",
         "offset": "0000",
-        "size": "1",
-        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "read_sector": {
-        "filename": "ramcode.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "0801",
-        "offset": "0001",
-        "size": "100",
-        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "initialize_crc": {
-        "filename": "ramcode.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "09cd",
-        "offset": "01cd",
-        "size": "6",
-        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "read_byte_ex": {
-        "filename": "ramcode.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "09d3",
-        "offset": "01d3",
-        "size": "10",
-        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "read_byte": {
-        "filename": "ramcode.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "09df",
-        "offset": "01df",
-        "size": "9",
+        "size": "500",
         "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
     }
 }

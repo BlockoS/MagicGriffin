@@ -56,34 +56,38 @@ put_message:
           sta     _si+1
           jmp     le468_00
 
+; Print a nul terminated string.
+; Parameters:
+;    A: string id.
+;
 put_string:
           asl     A
           tay     
           lda     pointer_table, Y
           sta     _si
-          lda     $e634, Y
+          lda     pointer_table+1, Y
           sta     _si+1
 le468_00:
           ldy     #$00
 @set_cursor:
-          lda     #$00
+          lda     #$00                          ; Set VRAM write address.
           sta     video_reg
-          lda     [$0e], Y
+          lda     [_si], Y
           sta     video_data_l
           iny     
-          lda     [$0e], Y
+          lda     [_si], Y
           sta     video_data_h
           iny     
-          lda     #$02
+          lda     #$02                          ; Set BAT.
           sta     video_reg
 @put_char:
-          lda     [$0e], Y
+          lda     [_si], Y                      ; Stop if the character is '\0'. 
           beq     @end
           iny     
-          cmp     #$ff
-          beq     @set_cursor
+          cmp     #$ff                          ; $ff means that the string will continue somewhere else.
+          beq     @set_cursor                   ; The next 2 bytes will be the BAT address where the next part will be printed.
           sta     video_data_l
-          lda     #$11
+          lda     #$11                          ; The font tiles are stored at $1000 in VRAM, and will  use palette #1.  
           sta     video_data_h
           bne     @put_char
 @end:
@@ -378,41 +382,44 @@ messages:
 	.bank $000
 	.org $eb00
 irq_reset:
-          sei     
-          cld     
-          csl     
+          sei                                       ; disable interrupts
+          cld                                       ; clear decimal flag
+          csl                                       ; switch cpu to low speed mode
           lda     #$f8
-          tam     #$00
+          tam     #$00                              ; mpr 0 = RAM 
           lda     #$f8
-          tam     #$01
+          tam     #$01                              ; mpr 1 = RAM
           lda     #$ff
-          tam     #$02
+          tam     #$02                              ; mpr 2 = 1st ROM bank
           lda     #$01
-          tam     #$06
+          tam     #$06                              ; mpr 6 = 1
           lda     #$02
-          tam     #$05
+          tam     #$05                              ; mpr 5 = 2
           lda     #$03
-          tam     #$04
+          tam     #$04                              ; mpr 4 = 3
           ldx     #$ff
           stx     stack_pointer
-          txs     
+          txs                                       ; reset stack pointer
           jsr     unknown_f006
+
           ldy     #$00
 @ramcode_init.0:
-          lda     ramcode, Y
-          sta     $0800, Y
-          lda     $edae, Y
-          sta     $0900, Y
-          lda     $eeae, Y
-          sta     $0a00, Y
-          lda     $efae, Y
-          sta     $0b00, Y
-          lda     $f0ae, Y
-          sta     $0c00, Y
+          lda     ramcode+$000, Y
+          sta     ramcode_dst, Y
+          lda     ramcode+$100, Y
+          sta     ramcode_dst+$100, Y
+          lda     ramcode+$200, Y
+          sta     ramcode_dst+$200, Y
+          lda     ramcode+$300, Y
+          sta     ramcode_dst+$300, Y
+          lda     ramcode+$400, Y
+          sta     ramcode_dst+$400, Y
           iny     
           bne     @ramcode_init.0
+
           ldy     #$00
           jmp     main
+
           sei     
           cld     
           csl     
@@ -433,16 +440,16 @@ irq_reset:
           jsr     unknown_f006
           ldy     #$00
 @ramcode_init.1:
-          lda     ramcode, Y
-          sta     $0800, Y
-          lda     $edae, Y
-          sta     $0900, Y
-          lda     $eeae, Y
-          sta     $0a00, Y
-          lda     $efae, Y
-          sta     $0b00, Y
-          lda     $f0ae, Y
-          sta     $0c00, Y
+          lda     ramcode+$000, Y
+          sta     ramcode_dst, Y
+          lda     ramcode+$100, Y
+          sta     ramcode_dst+$100, Y
+          lda     ramcode+$200, Y
+          sta     ramcode_dst+$200, Y
+          lda     ramcode+$300, Y
+          sta     ramcode_dst+$300, Y
+          lda     ramcode+$400, Y
+          sta     ramcode_dst+$400, Y
           iny     
           bne     @ramcode_init.1
 @loop:
@@ -452,13 +459,14 @@ irq_reset:
 main:
           sty     <$95
           jsr     video_init
+
           lda     #$00
           sta     <$94
           ldy     <$95
           cpy     #$02
           bcc     loop
-          ldy     #$00
-          sty     <$95
+              ldy     #$00
+              sty     <$95
 loop:
           tya     
           asl     A
@@ -467,11 +475,11 @@ loop:
           sta     <$93
           lda     menu.callback_table_pointers, Y
           sta     <$91
-          lda     $e620, Y
+          lda     menu.callback_table_pointers+1, Y
           sta     <$92
           lda     bat_coords, Y
           tax     
-          lda     $e618, Y
+          lda     bat_coords+1, Y
           tay     
           jsr     compute_cursor_bat_addr
           jsr     video_clear_bat
@@ -574,9 +582,17 @@ lec5c_00:
           sta     video_data_h
           rts     
 
+; Compute the BAT address of the cursor.
+; Parameters:
+;   X: X BAT coordinate.
+;   Y: Y BAT coordinate.
+; Return:
+;  $0100-$0109: MSB of the BAT addres of the menu lines.
+;  $0120-$0129: LSB od the BAT address.
+;
 compute_cursor_bat_addr:
-          txa     
-          asl     A
+          txa                                   ; As the BAT is 32 by 32 the address is computed this way:
+          asl     A                             ; addr = (X & 0x1f)+ Y*32
           asl     A
           asl     A
           sta     $0100
@@ -586,13 +602,13 @@ compute_cursor_bat_addr:
           lsr     A
           ror     $0100
           lsr     A
-          ror     $0100
-          sta     $0120
+          ror     $0100                         ; $1000 now contains the LSB of the BAT address.
+          sta     $0120                         ; $1200 its MSB.
           ldy     #$00
-@next_row:
+@next_row:                                      ; We compute the offset for the next 8 menu line.
           clc     
           lda     $0100, Y
-          adc     #$40
+          adc     #$40                          ; Jumps 2 lines.
           sta     $0101, Y
           lda     $0120, Y
           adc     #$00

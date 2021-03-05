@@ -4,5 +4,9 @@
     { "name":"@read_sector_infos", "logical":"0822", "page": "00"},
     { "name":"@wait_0", "logical":"0864", "page": "00"},
     { "name":"@data", "logical":"0992", "page": "00"},
-    { "name":"crc", "logical":"0a0c", "page": "00"}
+    { "name":"crc", "logical":"0a0c", "page": "00"},
+    { "name":"read_sector", "logical": "0801", "page": "00"},
+    { "name":"initialize_crc", "logical": "09cd", "page": "00"},
+    { "name":"read_byte_ex", "logical": "09d3", "page": "00"},
+    { "name":"read_byte", "logical": "09df", "page": "00"}
 ]
