@@ -1,5 +1,6 @@
 [
     { "name":"@loop", "logical":"e421", "page":"00"},
+    { "name":"print_string_raw", "logical":"e468", "page":"00"},
     { "name":"@set_cursor", "logical":"e46a", "page":"00"},
     { "name":"@put_char", "logical":"e480", "page":"00"},
     { "name":"@end", "logical":"e493", "page":"00"},
@@ -51,5 +52,8 @@
     { "name":"timer_ctrl", "logical":"4c01", "page": "ff"},
     { "name":"joyport", "logical":"5000", "page": "ff"},
     { "name":"irq_disable", "logical":"5402", "page": "ff"},
-    { "name":"irq_status", "logical":"5403", "page": "ff"}
+    { "name":"irq_status", "logical":"5403", "page": "ff"},
+
+    { "name":"disk_status", "logical":"c009", "page": "01"}
+
 ]

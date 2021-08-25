@@ -1,3 +1,7 @@
+;-------------------------------------------------------------------------------
+; Disassembly of the Super Magic Griffin ROM.
+; 
+;-------------------------------------------------------------------------------
     .data
     .bank $000
     .org $e000
@@ -7,6 +11,9 @@ gfx_data:
 	.code
 	.bank $000
 	.org $e400
+;-------------------------------------------------------------------------------
+; Disable VDC interrupts.
+;-------------------------------------------------------------------------------
 video_disable_interrupts:
           lda     #$05
           sta     video_reg
@@ -14,6 +21,9 @@ video_disable_interrupts:
           sta     video_data_l
           rts     
 
+;-------------------------------------------------------------------------------
+; Fill the BAT with 0.
+;-------------------------------------------------------------------------------
 video_clear_bat:
           lda     #$00
           sta     video_reg
@@ -33,6 +43,13 @@ video_clear_bat:
           bpl     @loop
           rts     
 
+;-------------------------------------------------------------------------------
+; Print a single character.
+; Parameters:
+;    A: Character id.
+;    Y: BAT address LSB
+;    X: BAT address MSB
+;-------------------------------------------------------------------------------
 put_char:
           pha     
           lda     #$00
@@ -47,19 +64,25 @@ put_char:
           sta     video_data_h
           rts     
 
+;-------------------------------------------------------------------------------
+; Print message.
+; Parameters:
+;    A: message id
+;-------------------------------------------------------------------------------
 put_message:
           asl     A
           tay     
           lda     message_pointer_table, Y
           sta     _si
-          lda     $e96a, Y
+          lda     message_pointer_table+1, Y
           sta     _si+1
-          jmp     le468_00
+          jmp     print_string_raw
 
+;-------------------------------------------------------------------------------
 ; Print a nul terminated string.
 ; Parameters:
 ;    A: string id.
-;
+;-------------------------------------------------------------------------------
 put_string:
           asl     A
           tay     
@@ -67,7 +90,7 @@ put_string:
           sta     _si
           lda     pointer_table+1, Y
           sta     _si+1
-le468_00:
+print_string_raw:
           ldy     #$00
 @set_cursor:
           lda     #$00                          ; Set VRAM write address.
@@ -93,6 +116,11 @@ le468_00:
 @end:
           rts     
 
+;-------------------------------------------------------------------------------
+; Read joypads.
+; Return:
+;    joypad - Joypad states.
+;-------------------------------------------------------------------------------
 read_joypad:
           lda     #$03
           sta     joyport
@@ -102,15 +130,15 @@ read_joypad:
           and     #$0f
           tax     
           lda     joypad_buttons, X
-          sta     <$f5
+          sta     <joypad
           lda     #$00
           sta     joyport
           lda     joyport
           and     #$0f
           tax     
           lda     joypad_directions, X
-          ora     <$f5
-          sta     <$f5
+          ora     <joypad
+          sta     <joypad
           rts     
 
 joypad_buttons:
@@ -119,9 +147,15 @@ joypad_buttons:
 joypad_directions:
           .db $f0,$70,$b0,$30,$d0,$50,$90,$10
           .db $e0,$60,$a0,$20,$c0,$40,$80,$00
+
+;-------------------------------------------------------------------------------
+; Wait for joypad.
+; Return:
+;    joypad - Joypad states.
+;-------------------------------------------------------------------------------
 wait_joypad:
           jsr     read_joypad
-          lda     <$f5
+          lda     <joypad
           bne     wait_joypad
           rts     
 
@@ -137,6 +171,10 @@ vdc_init_table:
           .db $0d,$ef,$00
           .db $0e,$00,$00
           .db $0f,$00,$00
+
+;-------------------------------------------------------------------------------
+; Initialize VDC, upload font to VRAM and setup font and background color.
+;-------------------------------------------------------------------------------
 video_init:
           lda     #$00
           sta     color_ctrl
@@ -186,6 +224,9 @@ video_init:
           sta     color_data_hi
           rts     
 
+;-------------------------------------------------------------------------------
+;
+;-------------------------------------------------------------------------------
 video_load_1bpp_32:
           ldy     #$00
 @load_1bpp_tile:
@@ -209,6 +250,8 @@ video_load_1bpp_32:
           bne     @load_1bpp_tile
           rts     
 
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 unknown_e59d:
           ldx     #$00
           stx     $0018
@@ -302,85 +345,88 @@ pointer_table:
           .dw $e87b
           .dw $e911
 strings:
-          db $82,$00,"MAGIC GRIFFIN V-1",$ff
-          db $05,$01,"RUN FILE",$ff
-          db $45,$01,"RUN IC CARD",$ff
-          db $85,$01,"SAVE IC CARD",$ff
-          db $c5,$01,"RENAME FILE",$ff
-          db $05,$02,"DELETE FILE",$ff
-          db $45,$02,"FORMAT DISK",$ff
-          db $12,$02,"RAM: 8M",$ff 
-          db $12,$01,"[",$18,$19,"]-CHOOSE",$ff
-          db $52,$01,"[I]-ACCEPT",$00,$82,$00,"UTILITY MENU",$ff
-          db $45,$01,"(RESERVED)",$00,$94,$00,$01,"1990 JSI",$ff
-          db $c7,$02,"`cf  ilo  rux  {~",$0d,$ff
-          db $e7,$02,"adg  jmp  svy  |",$7f,$0e,$ff
-          db $07,$03,"beh  knq  twz  }",$0c,$0f,$ff
-          db $48,$03,"FRONT FAREAST CO.",$00
-          db $82,$00,"RUN FILE",$ff
-          db $03,$01,"INSERT DISK...",$00
-          dn $82,$00,"RUN IC CARD",$00
-          db $82,$00,"SAVE IC CARD",$00
-          db $82,$00,"RENAME FILE",$ff
-          db $03,$01,"INSERT DISK...",$00
-          db $82,$00,"DELETE FILE",$ff
-          db $03,$01,"INSERT DISK...",$00
-          db $82,$00,"FORMAT DISK",$ff
-          db $c5,$00,"FORMAT SELECT:",$ff
-          db $05,$01,"1.44M (HD)",$ff
-          db $45,$01,"720K  (2D)",$00
-          db $85,$02,"LOADING....[000] "$00
-          db $85,$02,"SAVING.....[000] ",$00
-          db $85,$02,"RENAMING...      ",$00
-          db $85,$02,"DELETING...      ",$00
-          db $85,$02,"FORMATTING.[000] ",$00
-          db $c5,$00,"1M CARD",$00
-          db $03,$01,"  NEW NAME : ___________",$ff
-          db $45,$01,"0123456789ABCDEFGH",$ff
-          db $85,$01,"IJKLMNOPQRSTUVWXYZ",$ff
-          db $e5,$01,"[",$18,$19,$1b,$1a,"]-CHOOSE",$ff
-          db $05,$02,"[RUN]-CHAR INSERT",$ff
-          db $25,$02,"[SEL]-CHAR DELETE",$ff
-          db $45,$02,"[I]-ACCEPT  [II]-ABORT",$00
-          db $c5,$00,"FILE LIST:",$ff
-          db $12,$01,"[SEL]-PAGE",$ff
-          db $52,$01,"[",$18,$19,"]-CHOOSE",$ff
-          db $92,$01,"[I]-ACCEPT",$ff
-          db $d2,$01,"[II]-ABORT",$ff
-          db $12,$02,"FILE:   ",$ff
-          db $53,$02,"FREE:  M",$00
+          .db $82,$00,"MAGIC GRIFFIN V-1",$ff
+          .db $05,$01,"RUN FILE",$ff
+          .db $45,$01,"RUN IC CARD",$ff
+          .db $85,$01,"SAVE IC CARD",$ff
+          .db $c5,$01,"RENAME FILE",$ff
+          .db $05,$02,"DELETE FILE",$ff
+          .db $45,$02,"FORMAT DISK",$ff
+          .db $12,$02,"RAM: 8M",$ff 
+          .db $12,$01,"[",$18,$19,"]-CHOOSE",$ff
+          .db $52,$01,"[I]-ACCEPT",$00,$82,$00,"UTILITY MENU",$ff
+          .db $45,$01,"(RESERVED)",$00,$94,$00,$01,"1990 JSI",$ff
+          .db $c7,$02,"`cf  ilo  rux  {~",$0d,$ff
+          .db $e7,$02,"adg  jmp  svy  |",$7f,$0e,$ff
+          .db $07,$03,"beh  knq  twz  }",$0c,$0f,$ff
+          .db $48,$03,"FRONT FAREAST CO.",$00
+          .db $82,$00,"RUN FILE",$ff
+          .db $03,$01,"INSERT DISK...",$00
+          .db $82,$00,"RUN IC CARD",$00
+          .db $82,$00,"SAVE IC CARD",$00
+          .db $82,$00,"RENAME FILE",$ff
+          .db $03,$01,"INSERT DISK...",$00
+          .db $82,$00,"DELETE FILE",$ff
+          .db $03,$01,"INSERT DISK...",$00
+          .db $82,$00,"FORMAT DISK",$ff
+          .db $c5,$00,"FORMAT SELECT:",$ff
+          .db $05,$01,"1.44M (HD)",$ff
+          .db $45,$01,"720K  (2D)",$00
+          .db $85,$02,"LOADING....[000] ",$00
+          .db $85,$02,"SAVING.....[000] ",$00
+          .db $85,$02,"RENAMING...      ",$00
+          .db $85,$02,"DELETING...      ",$00
+          .db $85,$02,"FORMATTING.[000] ",$00
+          .db $c5,$00,"1M CARD",$00
+          .db $03,$01,"  NEW NAME : ___________",$ff
+          .db $45,$01,"0123456789ABCDEFGH",$ff
+          .db $85,$01,"IJKLMNOPQRSTUVWXYZ",$ff
+          .db $e5,$01,"[",$18,$19,$1b,$1a,"]-CHOOSE",$ff
+          .db $05,$02,"[RUN]-CHAR INSERT",$ff
+          .db $25,$02,"[SEL]-CHAR DELETE",$ff
+          .db $45,$02,"[I]-ACCEPT  [II]-ABORT",$00
+          .db $c5,$00,"FILE LIST:",$ff
+          .db $12,$01,"[SEL]-PAGE",$ff
+          .db $52,$01,"[",$18,$19,"]-CHOOSE",$ff
+          .db $92,$01,"[I]-ACCEPT",$ff
+          .db $d2,$01,"[II]-ABORT",$ff
+          .db $12,$02,"FILE:   ",$ff
+          .db $53,$02,"FREE:  M",$00
 
 message_pointer_table:
-          .dw $e981
-          .dw $e986
-          .dw $e999
-          .dw $e9ac
-          .dw $e9bf
-          .dw $e9d2
-          .dw $e9e5
-          .dw $e9f8
-          .dw $ea0b
-          .dw $ea1e
-          .dw $ea31
-          .dw $ea44
+          .dw msg_ok
+          .dw msg_err
+          .dw msg_no_disk
+          .dw msg_read_err
+          .dw msg_write_err
+          .dw msg_no_file
+          .dw msg_write_protected
+          .dw msg_file_not_found
+          .dw msg_file_dup
+          .dw msg_no_space
+          .dw msg_no_card
+          .dw msg_file_err
 
 messages:
-          db $85,$02,"OK",$00
-          db $85,$02,"ERR             ",$00
-          db $85,$02,"NO DISK         ",$00
-          db $85,$02,"READ ERR        ",$00
-          db $85,$02,"WRITE ERR       ",$00
-          dn $85,$02,"NO FILE         ",$00
-          db $85,$02,"WRITE PROTECTED ",$00
-          db $85,$02,"FILE NOT FOUND  ",$00
-          db $85,$02,"DUP FILE NAME   ",$00
-          db $85,$02,"NOT ENOUGH SPACE",$00 
-          db $85,$02,"NO IC CARD      ",$00
-          db $85,$02,"FILE ERR        ",$00
+msg_ok:              .db $85,$02,"OK",$00
+msg_err:             .db $85,$02,"ERR             ",$00
+msg_no_disk:         .db $85,$02,"NO DISK         ",$00
+msg_read_err:        .db $85,$02,"READ ERR        ",$00
+msg_write_err:       .db $85,$02,"WRITE ERR       ",$00
+msg_no_file:         .db $85,$02,"NO FILE         ",$00
+msg_write_protected: .db $85,$02,"WRITE PROTECTED ",$00
+msg_file_not_found:  .db $85,$02,"FILE NOT FOUND  ",$00
+msg_file_dup:        .db $85,$02,"DUP FILE NAME   ",$00
+msg_no_space:        .db $85,$02,"NOT ENOUGH SPACE",$00 
+msg_no_card:         .db $85,$02,"NO IC CARD      ",$00
+msg_file_err:        .db $85,$02,"FILE ERR        ",$00
           
 	.code
 	.bank $000
 	.org $eb00
+;-------------------------------------------------------------------------------
+; Reset IRQ handler.
+;-------------------------------------------------------------------------------
 irq_reset:
           sei                                       ; disable interrupts
           cld                                       ; clear decimal flag
@@ -390,13 +436,15 @@ irq_reset:
           lda     #$f8
           tam     #$01                              ; mpr 1 = RAM
           lda     #$ff
-          tam     #$02                              ; mpr 2 = 1st ROM bank
+          tam     #$02                              ; mpr 2 = I/O
           lda     #$01
-          tam     #$06                              ; mpr 6 = 1
+          tam     #$06                              ; mpr 6 = 
           lda     #$02
-          tam     #$05                              ; mpr 5 = 2
+          tam     #$05                              ; mpr 5 = 
           lda     #$03
-          tam     #$04                              ; mpr 4 = 3
+          tam     #$04                              ; mpr 4 = 
+
+                                                    ; mpr 7 = 1st ROM bank (by default)
           ldx     #$ff
           stx     stack_pointer
           txs                                       ; reset stack pointer
@@ -453,7 +501,7 @@ irq_reset:
           iny     
           bne     @ramcode_init.1
 @loop:
-          jsr     l0801_248
+          jsr     read_sector
           jmp     @loop
 
 main:
@@ -490,7 +538,7 @@ loop:
           jsr     unknown_face
 @update:
           jsr     menu_update
-          lda     <$f5
+          lda     <joypad
           bpl     @update
           jsr     video_clear_bat
           lda     #$03
@@ -531,10 +579,10 @@ menu_update:
 @loop:
           bit     $c009
           bpl     @no_disk
-          jsr     l0801_248
+              jsr     read_sector
 @no_disk:
           jsr     read_joypad
-          lda     <$f5
+          lda     <joypad
           beq     @loop
           bmi     @I
           and     #$0c
@@ -546,7 +594,7 @@ menu_update:
 @dir:
           ldx     #$20
           jsr     update_cursor
-          lda     <$f5
+          lda     <joypad
           and     #$04
           bne     @down
 @up:
@@ -582,14 +630,15 @@ lec5c_00:
           sta     video_data_h
           rts     
 
+;-------------------------------------------------------------------------------
 ; Compute the BAT address of the cursor.
 ; Parameters:
-;   X: X BAT coordinate.
-;   Y: Y BAT coordinate.
+;    X: X BAT coordinate.
+;    Y: Y BAT coordinate.
 ; Return:
 ;  $0100-$0109: MSB of the BAT addres of the menu lines.
 ;  $0120-$0129: LSB od the BAT address.
-;
+;-------------------------------------------------------------------------------
 compute_cursor_bat_addr:
           txa                                   ; As the BAT is 32 by 32 the address is computed this way:
           asl     A                             ; addr = (X & 0x1f)+ Y*32
@@ -788,7 +837,7 @@ menu.format_disk:
           sta     <$94
 @loop:
           jsr     menu_update
-          lda     <$f5
+          lda     <joypad
           and     #$c0
           beq     @loop
 @check_button:
@@ -879,9 +928,9 @@ lfae3_00:
 	.bank $000
 	.org $ff0c
 copyright:
-          db "*** MAGIC GRIFFIN V-1 ***"
-          db "COPYRIGHT 1990 BY JSI, FRONT FAREAST CO."
-          db "ALL RIGHTS RESERVED 11/12/9"
+          .db "*** MAGIC GRIFFIN V-1 ***"
+          .db "COPYRIGHT 1990 BY JSI, FRONT FAREAST CO."
+          .db "ALL RIGHTS RESERVED 11/12/90"
 
 	.data
 	.bank $000
