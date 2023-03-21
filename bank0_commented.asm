@@ -693,12 +693,24 @@ unknown_f006:                           ; bank: $000 logical: $f006
           lda     #$04
           sta     $c002
           rts     
+lf00c_00:                               ; bank: $000 logical: $f00c
+          bit     $c004                 ; c004 may be the main status register ($3f4 in the mcs3201 datasheet)
+          bpl     lf00c_00              ; bit 7 = 1 -> ready for host to send or receive data
+          bvc     lf00c_00              ; bit 6 = 0 -> data transfer from host to controller
+          lda     $c005
+          rts     
+lf017_00:                               ; bank: $000 logical: $f017
+          bit     $c004
+          bpl     lf017_00              ; bit 7 = 1 -> ready for host to send or receive data
+          bvs     lf017_00              ; bit 6 = 1 -> data transfer from controller to host
+          sta     $c005
+          rts     
 
 	.code
 	.bank $000
 	.org $f6af
 unknown_f6af:                           ; bank: $000 logical: $f6af
-          ldx     <$24
+          ldx     <$24                  ; 2: format 1.44M, 3: format 720K
           lda     $f797, X
           sta     $c007
           lda     $f7ab, X
