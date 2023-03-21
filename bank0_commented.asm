@@ -11,20 +11,20 @@ gfx_data:
 	.code
 	.bank $000
 	.org $e400
-;-------------------------------------------------------------------------------
-; Disable VDC interrupts.
-;-------------------------------------------------------------------------------
-video_disable_interrupts:
+; -------------------------------------------------------------------------------
+;  Disable VDC interrupts.
+; -------------------------------------------------------------------------------
+video_disable_interrupts:               ; bank: $000 logical: $e400
           lda     #$05
           sta     video_reg
           lda     #$00
           sta     video_data_l
           rts     
 
-;-------------------------------------------------------------------------------
-; Fill the BAT with 0.
-;-------------------------------------------------------------------------------
-video_clear_bat:
+; -------------------------------------------------------------------------------
+;  Fill the BAT with 0..
+; -------------------------------------------------------------------------------
+video_clear_bat:                        ; bank: $000 logical: $e40b
           lda     #$00
           sta     video_reg
           sta     video_data_l
@@ -34,7 +34,7 @@ video_clear_bat:
           ldx     #$03
           ldy     #$00
           lda     #$00
-@loop:
+@loop:                                  ; bank: $000 logical: $e421
           sta     video_data_l
           sta     video_data_h
           iny     
@@ -43,14 +43,14 @@ video_clear_bat:
           bpl     @loop
           rts     
 
-;-------------------------------------------------------------------------------
-; Print a single character.
-; Parameters:
-;    A: Character id.
-;    Y: BAT address LSB
-;    X: BAT address MSB
-;-------------------------------------------------------------------------------
-put_char:
+; -------------------------------------------------------------------------------
+;  Print a single character.
+;  Parameters:
+;     A: Character id.
+;     Y: BAT address LSB
+;     X: BAT address MSB
+; -------------------------------------------------------------------------------
+put_char:                               ; bank: $000 logical: $e42e
           pha     
           lda     #$00
           sta     video_reg
@@ -64,12 +64,12 @@ put_char:
           sta     video_data_h
           rts     
 
-;-------------------------------------------------------------------------------
-; Print message.
-; Parameters:
-;    A: message id
-;-------------------------------------------------------------------------------
-put_message:
+; -------------------------------------------------------------------------------
+;  Print message.
+;  Parameters:
+;     A: message id
+; -------------------------------------------------------------------------------
+put_message:                            ; bank: $000 logical: $e449
           asl     A
           tay     
           lda     message_pointer_table, Y
@@ -78,21 +78,21 @@ put_message:
           sta     _si+1
           jmp     print_string_raw
 
-;-------------------------------------------------------------------------------
-; Print a nul terminated string.
-; Parameters:
-;    A: string id.
-;-------------------------------------------------------------------------------
-put_string:
+; -------------------------------------------------------------------------------
+;  Print a nul terminated string.
+;  Parameters:
+;     A: string id.
+; -------------------------------------------------------------------------------
+put_string:                             ; bank: $000 logical: $e45a
           asl     A
           tay     
           lda     pointer_table, Y
           sta     _si
           lda     pointer_table+1, Y
           sta     _si+1
-print_string_raw:
+print_string_raw:                       ; bank: $000 logical: $e468
           ldy     #$00
-@set_cursor:
+@set_cursor:                            ; bank: $000 logical: $e46a
           lda     #$00                          ; Set VRAM write address.
           sta     video_reg
           lda     [_si], Y
@@ -103,7 +103,7 @@ print_string_raw:
           iny     
           lda     #$02                          ; Set BAT.
           sta     video_reg
-@put_char:
+@put_char:                              ; bank: $000 logical: $e480
           lda     [_si], Y                      ; Stop if the character is '\0'. 
           beq     @end
           iny     
@@ -113,15 +113,15 @@ print_string_raw:
           lda     #$11                          ; The font tiles are stored at $1000 in VRAM, and will  use palette #1.  
           sta     video_data_h
           bne     @put_char
-@end:
+@end:                                   ; bank: $000 logical: $e493
           rts     
 
-;-------------------------------------------------------------------------------
-; Read joypads.
-; Return:
-;    joypad - Joypad states.
-;-------------------------------------------------------------------------------
-read_joypad:
+; -------------------------------------------------------------------------------
+;  Read joypads.
+;  Return:
+;     joypad - Joypad states.
+; -------------------------------------------------------------------------------
+read_joypad:                            ; bank: $000 logical: $e494
           lda     #$03
           sta     joyport
           lda     #$01
@@ -141,25 +141,24 @@ read_joypad:
           sta     <joypad
           rts     
 
-joypad_buttons:
+joypad_buttons:                         ; bank: $000 logical: $e4bc
           .db $0f,$07,$0e,$06,$0b,$03,$0a,$02
           .db $0d,$05,$0c,$04,$09,$01,$08,$00
-joypad_directions:
+joypad_directions:                      ; bank: $000 logical: $e4cc
           .db $f0,$70,$b0,$30,$d0,$50,$90,$10
           .db $e0,$60,$a0,$20,$c0,$40,$80,$00
-
-;-------------------------------------------------------------------------------
-; Wait for joypad.
-; Return:
-;    joypad - Joypad states.
-;-------------------------------------------------------------------------------
-wait_joypad:
+; -------------------------------------------------------------------------------
+;  Wait for joypad.
+;  Return:
+;     joypad - Joypad states.
+; -------------------------------------------------------------------------------
+wait_joypad:                            ; bank: $000 logical: $e4dc
           jsr     read_joypad
           lda     <joypad
           bne     wait_joypad
           rts     
 
-vdc_init_table:
+vdc_init_table:                         ; bank: $000 logical: $e4e4
           .db $05,$80,$00
           .db $06,$00,$00
           .db $07,$00,$00
@@ -171,15 +170,14 @@ vdc_init_table:
           .db $0d,$ef,$00
           .db $0e,$00,$00
           .db $0f,$00,$00
-
-;-------------------------------------------------------------------------------
-; Initialize VDC, upload font to VRAM and setup font and background color.
-;-------------------------------------------------------------------------------
-video_init:
+; -------------------------------------------------------------------------------
+;  Initialize VDC, upload font to VRAM and setup font and background color.
+; -------------------------------------------------------------------------------
+video_init:                             ; bank: $000 logical: $e505
           lda     #$00
           sta     color_ctrl
           ldy     #$00
-@l0:
+@l0:                                    ; bank: $000 logical: $e50c
           lda     vdc_init_table, Y
           sta     video_reg
           iny     
@@ -227,11 +225,11 @@ video_init:
 ;-------------------------------------------------------------------------------
 ;
 ;-------------------------------------------------------------------------------
-video_load_1bpp_32:
+video_load_1bpp_32:                     ; bank: $000 logical: $e579
           ldy     #$00
-@load_1bpp_tile:
+@load_1bpp_tile:                        ; bank: $000 logical: $e57b
           ldx     #$08
-@plane_01:
+@plane_01:                              ; bank: $000 logical: $e57d
           lda     [$0e], Y
           sta     video_data_l
           lda     #$00
@@ -241,7 +239,7 @@ video_load_1bpp_32:
           bne     @plane_01
           ldx     #$08
           lda     #$00
-@plane_23:
+@plane_23:                              ; bank: $000 logical: $e58f
           sta     video_data_l
           sta     video_data_h
           dex     
@@ -252,24 +250,24 @@ video_load_1bpp_32:
 
 ;-------------------------------------------------------------------------------
 ;-------------------------------------------------------------------------------
-unknown_e59d:
+unknown_e59d:                           ; bank: $000 logical: $e59d:
           ldx     #$00
           stx     $0018
           stx     $0019
           stx     $001a
-le5a8_00:
+le5a8_00:                               ; bank: $000 logical: $e5a8
           cmp     #$64
           bcc     le5b4_00
           sbc     #$64
           inc     $001a
           jmp     le5a8_00
-le5b4_00:
+le5b4_00:                               ; bank: $000 logical: $e5b4
           cmp     #$0a
           bcc     le5c0_00
           sbc     #$0a
           inc     $0019
           jmp     le5b4_00
-le5c0_00:
+le5c0_00:                               ; bank: $000 logical: $e5c0
           sta     $0018
           rts     
           lda     #$00
@@ -304,28 +302,28 @@ le5c0_00:
           lda     #$09
           sta     $0019
           dec     $001a
-le616_00:
+le616_00:                               ; bank: $000 logical: $e616
           rts     
 
-bat_coords:
+bat_coords:                             ; bank: $000 logical: $e617
           .db $03,$08
           .db $03,$08
-menu.item_count:
+menu.item_count:                        ; bank: $000 logical: $e61b
           .db $06,$00,$02,$00
-menu.callback_table_pointers:
+menu.callback_table_pointers:           ; bank: $000 logical: $e61f
           .dw $e623
           .dw $e62f
-main_menu.callbacks:
+main_menu.callbacks:                    ; bank: $000 logical: $e623
           .dw $f7f3
           .dw $f8a2
           .dw $f8a8
           .dw $f807
           .dw $f849
           .dw $f86f
-unknown_menu.callbacks:
+unknown_menu.callbacks:                 ; bank: $000 logical: $e62f
           .dw $0f00
           .dw $0f03
-pointer_table:
+pointer_table:                          ; bank: $000 logical: $e633
           .dw $e657
           .dw $e6e2
           .dw $e6f1
@@ -344,7 +342,7 @@ pointer_table:
           .dw $e871
           .dw $e87b
           .dw $e911
-strings:
+strings:                                ; bank: $000 logical: $e657
           .db $82,$00,"MAGIC GRIFFIN V-1",$ff
           .db $05,$01,"RUN FILE",$ff
           .db $45,$01,"RUN IC CARD",$ff
@@ -393,7 +391,7 @@ strings:
           .db $12,$02,"FILE:   ",$ff
           .db $53,$02,"FREE:  M",$00
 
-message_pointer_table:
+message_pointer_table:                  ; bank: $000 logical: $e969
           .dw msg_ok
           .dw msg_err
           .dw msg_no_disk
@@ -407,27 +405,37 @@ message_pointer_table:
           .dw msg_no_card
           .dw msg_file_err
 
-messages:
-msg_ok:              .db $85,$02,"OK",$00
-msg_err:             .db $85,$02,"ERR             ",$00
-msg_no_disk:         .db $85,$02,"NO DISK         ",$00
-msg_read_err:        .db $85,$02,"READ ERR        ",$00
-msg_write_err:       .db $85,$02,"WRITE ERR       ",$00
-msg_no_file:         .db $85,$02,"NO FILE         ",$00
-msg_write_protected: .db $85,$02,"WRITE PROTECTED ",$00
-msg_file_not_found:  .db $85,$02,"FILE NOT FOUND  ",$00
-msg_file_dup:        .db $85,$02,"DUP FILE NAME   ",$00
-msg_no_space:        .db $85,$02,"NOT ENOUGH SPACE",$00 
-msg_no_card:         .db $85,$02,"NO IC CARD      ",$00
-msg_file_err:        .db $85,$02,"FILE ERR        ",$00
-          
+msg_ok:                                 ; bank: $000 logical: $e981
+          db $85,$02,"OK",$00,
+msg_err:                                ; bank: $000 logical: $e986
+          db $85,$02,"ERR             ",$00
+msg_no_disk:                            ; bank: $000 logical: $e999
+          db $85,$02,"NO DISK         ",$00
+msg_read_err:                           ; bank: $000 logical: $e9ac
+          db $85,$02,"READ ERR        ",$00
+msg_write_err:                          ; bank: $000 logical: $e9bf
+          db $85,$02,"WRITE ERR       ",$00
+msg_no_file:                            ; bank: $000 logical: $e9d2
+          db $85,$02,"NO FILE         ",$00
+msg_write_protected:                    ; bank: $000 logical: $e9e5
+          db $85,$02,"WRITE PROTECTED ",$00
+msg_file_not_found:                     ; bank: $000 logical: $e9f8
+          db $85,$02,"FILE NOT FOUND  ",$00
+msg_file_dup:                           ; bank: $000 logical: $ea0b
+          db $85,$02,"DUP FILE NAME   ",$00
+msg_no_space:                           ; bank: $000 logical: $ea1e
+          db $85,$02,"NOT ENOUGH SPACE",$00
+msg_no_card:                            ; bank: $000 logical: $ea31
+          db $85,$02,"NO IC CARD      ",$00
+msg_file_err:                           ; bank: $000 logical: $ea44
+          db $85,$02,"FILE ERR        ",$00
 	.code
 	.bank $000
 	.org $eb00
-;-------------------------------------------------------------------------------
-; Reset IRQ handler.
-;-------------------------------------------------------------------------------
-irq_reset:
+; -------------------------------------------------------------------------------
+;  Reset IRQ handler.
+; -------------------------------------------------------------------------------
+irq_reset:                              ; bank: $000 logical: $eb00
           sei                                       ; disable interrupts
           cld                                       ; clear decimal flag
           csl                                       ; switch cpu to low speed mode
@@ -451,7 +459,7 @@ irq_reset:
           jsr     unknown_f006
 
           ldy     #$00
-@ramcode_init.0:
+@ramcode_init.0:                        ; bank: $000 logical: $eb26
           lda     ramcode+$000, Y
           sta     ramcode_dst, Y
           lda     ramcode+$100, Y
@@ -487,7 +495,7 @@ irq_reset:
           txs     
           jsr     unknown_f006
           ldy     #$00
-@ramcode_init.1:
+@ramcode_init.1:                        ; bank: $000 logical: $eb6f
           lda     ramcode+$000, Y
           sta     ramcode_dst, Y
           lda     ramcode+$100, Y
@@ -500,11 +508,11 @@ irq_reset:
           sta     ramcode_dst+$400, Y
           iny     
           bne     @ramcode_init.1
-@loop:
+@loop:                                  ; bank: $000 logical: $eb90
           jsr     read_sector
           jmp     @loop
 
-main:
+main:                                   ; bank: $000 logical: $eb96
           sty     <$95
           jsr     video_init
 
@@ -515,7 +523,7 @@ main:
           bcc     loop
               ldy     #$00
               sty     <$95
-loop:
+loop:                                   ; bank: $000 logical: $eba9
           tya     
           asl     A
           tay     
@@ -536,7 +544,7 @@ loop:
           lda     #$03
           jsr     put_string
           jsr     unknown_face
-@update:
+@update:                                ; bank: $000 logical: $ebd6
           jsr     menu_update
           lda     <joypad
           bpl     @update
@@ -567,20 +575,20 @@ loop:
           tay     
           jmp     loop
 
-run_submenu:
+run_submenu:                            ; bank: $000 logical: $ec0f
           tsx     
           stx     <$90
           jmp     [_si]
 
-menu_update:
+menu_update:                            ; bank: $000 logical: $ec15
           ldx     #$10
           jsr     update_cursor
           jsr     wait_joypad
-@loop:
-          bit     $c009
+@loop:                                  ; bank: $000 logical: $ec1d
+          bit     disk_status
           bpl     @no_disk
               jsr     read_sector
-@no_disk:
+@no_disk:                               ; bank: $000 logical: $ec25
           jsr     read_joypad
           lda     <joypad
           beq     @loop
@@ -589,32 +597,32 @@ menu_update:
           bne     @dir
           ldx     #$20
           jsr     update_cursor
-@I:
+@I:                                     ; bank: $000 logical: $ec37
           rts     
-@dir:
+@dir:                                   ; bank: $000 logical: $ec38
           ldx     #$20
           jsr     update_cursor
           lda     <joypad
           and     #$04
           bne     @down
-@up:
+@up:                                    ; bank: $000 logical: $ec43
           dec     <$94
           jmp     menu_update
-@down:
+@down:                                  ; bank: $000 logical: $ec48
           inc     <$94
           jmp     menu_update
 
-update_cursor:
+update_cursor:                          ; bank: $000 logical: $ec4d
           lda     <$94
           bpl     lec56_00
           lda     <$93
           sec     
           sbc     #$01
-lec56_00:
+lec56_00:                               ; bank: $000 logical: $ec56
           cmp     <$93
           bcc     lec5c_00
           lda     #$00
-lec5c_00:
+lec5c_00:                               ; bank: $000 logical: $ec5c
           sta     <$94
           tay     
           lda     #$00
@@ -630,16 +638,16 @@ lec5c_00:
           sta     video_data_h
           rts     
 
-;-------------------------------------------------------------------------------
-; Compute the BAT address of the cursor.
-; Parameters:
-;    X: X BAT coordinate.
-;    Y: Y BAT coordinate.
-; Return:
-;  $0100-$0109: MSB of the BAT addres of the menu lines.
-;  $0120-$0129: LSB od the BAT address.
-;-------------------------------------------------------------------------------
-compute_cursor_bat_addr:
+; -------------------------------------------------------------------------------
+;  Compute the BAT address of the cursor.
+;  Parameters:
+;     X: X BAT coordinate.
+;     Y: Y BAT coordinate.
+;  Return:
+;   $0100-$0109: MSB of the BAT addres of the menu lines.
+;   $0120-$0129: LSB od the BAT address.
+; -------------------------------------------------------------------------------
+compute_cursor_bat_addr:                ; bank: $000 logical: $ec7e
           txa                                   ; As the BAT is 32 by 32 the address is computed this way:
           asl     A                             ; addr = (X & 0x1f)+ Y*32
           asl     A
@@ -676,12 +684,12 @@ ramcode:
 	.code
 	.bank $000
 	.org $f000
-unknown_f000:
+unknown_f000:                           ; bank: $000 logical: $f000
           lda     #$2d
           sta     $c002
           rts     
 
-unknown_f006:
+unknown_f006:                           ; bank: $000 logical: $f006
           lda     #$04
           sta     $c002
           rts     
@@ -689,7 +697,7 @@ unknown_f006:
 	.code
 	.bank $000
 	.org $f6af
-unknown_f6af:
+unknown_f6af:                           ; bank: $000 logical: $f6af
           ldx     <$24
           lda     $f797, X
           sta     $c007
@@ -703,7 +711,7 @@ unknown_f6af:
           sta     <$26
           ldy     #$00
           tya     
-lf6ce_00:
+lf6ce_00:                               ; bank: $000 logical: $f6ce
           sta     $0200, Y
           sta     $0300, Y
           dey     
@@ -719,7 +727,7 @@ lf6ce_00:
           jsr     lf041_00
           jsr     lf5e5_00
           ldx     #$00
-lf6f5_00:
+lf6f5_00:                               ; bank: $000 logical: $f6f5
           stx     <$32
           jsr     lf022_00
           jsr     le5c4_00
@@ -751,7 +759,7 @@ lf6f5_00:
           lda     $f7b0, X
           sta     <$0f
           ldy     #$0e
-lf73c_00:
+lf73c_00:                               ; bank: $000 logical: $f73c
           lda     [$0e], Y
           sta     $020c, Y
           dey     
@@ -759,7 +767,7 @@ lf73c_00:
           dec     <$1e
           jsr     lf1b3_00
           ldx     <$32
-lf74b_00:
+lf74b_00:                               ; bank: $000 logical: $f74b
           inx     
           cpx     <$25
           bcc     lf6f5_00
@@ -768,7 +776,7 @@ lf74b_00:
 	.code
 	.bank $000
 	.org $f7f3
-menu.run_file:
+menu.run_file:                          ; bank: $000 logical: $f7f3
           jsr     lfb8a_00
           lda     #$0a
           jsr     put_string
@@ -777,7 +785,7 @@ menu.run_file:
           jsr     unknown_f006
           jmp     l0a0d_248
 
-menu.rename_file:
+menu.rename_file:                       ; bank: $000 logical: $f807
           jsr     lfb8a_00
           jsr     video_clear_bat
           lda     #$03
@@ -793,14 +801,14 @@ menu.rename_file:
           bcc     lf82f_00
           lda     #$08
           jmp     lf913_00
-lf82f_00:
+lf82f_00:                               ; bank: $000 logical: $f82f
           jsr     lf43e_00
           bcs     lf839_00
           lda     #$07
           jmp     lf913_00
-lf839_00:
+lf839_00:                               ; bank: $000 logical: $f839
           ldx     #$0a
-lf83b_00:
+lf83b_00:                               ; bank: $000 logical: $f83b
           lda     <$40, X
           sta     <$4b, X
           dex     
@@ -809,7 +817,7 @@ lf83b_00:
           jsr     unknown_f006
           rts     
 
-menu.delete_file:
+menu.delete_file:                       ; bank: $000 logical: $f849
           jsr     lfb8a_00
           lda     #$0d
           jsr     put_string
@@ -819,7 +827,7 @@ menu.delete_file:
           bcs     lf861_00
           lda     #$07
           jmp     lf913_00
-lf861_00:
+lf861_00:                               ; bank: $000 logical: $f861
           jsr     lf47d_00
           lda     #$e5
           sta     <$4b
@@ -827,7 +835,7 @@ lf861_00:
           jsr     unknown_f006
           rts     
 
-menu.format_disk:
+menu.format_disk:                       ; bank: $000 logical: $f86f
           ldx     #$03
           ldy     #$08
           jsr     compute_cursor_bat_addr
@@ -835,17 +843,17 @@ menu.format_disk:
           sta     <$93
           lda     #$00
           sta     <$94
-@loop:
+@loop:                                  ; bank: $000 logical: $f87e
           jsr     menu_update
           lda     <joypad
           and     #$c0
           beq     @loop
-@check_button:
+@check_button:                          ; bank: $000 logical: $f887
           and     #$80
           bne     @format_disk
-@previous_menu:
+@previous_menu:                         ; bank: $000 logical: $f88b
           rts     
-@format_disk:
+@format_disk:                           ; bank: $000 logical: $f88c
           lda     #$0e
           jsr     put_string
           lda     <$94
@@ -857,11 +865,11 @@ menu.format_disk:
           jsr     unknown_f006
           rts     
 
-menu.run_ic_card:
+menu.run_ic_card:                       ; bank: $000 logical: $f8a2
           jsr     lfaeb_00
           jmp     l0a43_248
 
-menu.save_ic_card:
+menu.save_ic_card:                      ; bank: $000 logical: $f8a8
           jsr     lfaeb_00
           jsr     lfb1b_00
           lda     #$0f
@@ -898,7 +906,7 @@ menu.save_ic_card:
 	.code
 	.bank $000
 	.org $fabf
-unknown_fabf:
+unknown_fabf:                           ; bank: $000 logical: $fabf
           lda     <$28
           and     #$03
           tax     
@@ -908,7 +916,7 @@ unknown_fabf:
           tam     #$04
           rts     
 
-unknown_face:
+unknown_face:                           ; bank: $000 logical: $face
           lda     #$7f
           sta     <$28
           jsr     unknown_fabf
@@ -918,7 +926,7 @@ unknown_face:
           cpx     $8000
           beq     lfae3_00
           lda     #$34
-lfae3_00:
+lfae3_00:                               ; bank: $000 logical: $fae3
           ldx     #$02
           ldy     #$17
           jsr     put_char
@@ -927,7 +935,7 @@ lfae3_00:
 	.data
 	.bank $000
 	.org $ff0c
-copyright:
+copyright:                              ; bank: $000 logical: $ff0c
           .db "*** MAGIC GRIFFIN V-1 ***"
           .db "COPYRIGHT 1990 BY JSI, FRONT FAREAST CO."
           .db "ALL RIGHTS RESERVED 11/12/90"
@@ -935,7 +943,7 @@ copyright:
 	.data
 	.bank $000
 	.org $fff6
-irq_table:
+irq_table:                              ; bank: $000 logical: $fff6
           .dw $ffff
           .dw $ffff
           .dw $ffff
