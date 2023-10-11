@@ -1,0 +1,33 @@
+[
+	{ "logical":"e46a", "page":"00", "text": "set VRAM write address." },
+	{ "logical":"e47b", "page":"00", "text": "set BAT." },
+	{ "logical":"e480", "page":"00", "text": "stop if the character is '\\0'." },
+	{ "logical":"e485", "page":"00", "text": "$ff means that the string will continue somewhere else." },
+	{ "logical":"e487", "page":"00", "text": "the next 2 bytes will be the BAT address where the next part will be printed." },
+	{ "logical":"e48c", "page":"00", "text": "the font tiles are stored at $1000 in VRAM, and will  use palette #1." },
+	{ "logical":"eb00", "page":"00", "text": "disable interrupts" },
+	{ "logical":"eb01", "page":"00", "text": "clear decimal flag" },
+	{ "logical":"eb02", "page":"00", "text": "switch cpu to low speed mode" },
+	{ "logical":"eb05", "page":"00", "text": "mpr 0 = RAM" }, 
+	{ "logical":"eb09", "page":"00", "text": "mpr 1 = RAM" },
+	{ "logical":"eb0d", "page":"00", "text": "mpr 2 = I/O" },
+	{ "logical":"eb11", "page":"00", "text": "mpr 6 = " },
+	{ "logical":"eb15", "page":"00", "text": "mpr 5 = " },
+	{ "logical":"eb19", "page":"00", "text": [
+			"mpr 4 = ",
+			"mpr 7 = 1st ROM bank (by default)"
+		]
+	},
+	{ "logical":"ec7e", "page":"00", "text": "as the BAT is 32 by 32 the address is computed this way:" },
+	{ "logical":"ec7f", "page":"00", "text": "addr = (X & 0x1f)+ Y*32" },
+	{ "logical":"ec8f", "page":"00", "text": "$1000 now contains the LSB of the BAT address." },
+	{ "logical":"ec92", "page":"00", "text": "$1200 its MSB." },
+	{ "logical":"ec97", "page":"00", "text": "we compute the offset for the next 8 menu line." },
+	{ "logical":"ec9b", "page":"00", "text": "jumps 2 lines." },
+	{ "logical":"f00c", "page":"00", "text": "c004 may be the main status register ($3f4 in the mcs3201 datasheet)" },
+	{ "logical":"f00f", "page":"00", "text": "bit 7 = 1 -> ready for host to send or receive data" },
+	{ "logical":"f011", "page":"00", "text": "bit 6 = 0 -> data transfer from host to controller" },
+	{ "logical":"f01a", "page":"00", "text": "bit 7 = 1 -> ready for host to send or receive data" },
+	{ "logical":"f01c", "page":"00", "text": "bit 6 = 1 -> data transfer from controller to host" },
+	{ "logical":"f6af", "page":"00", "text": "2: format 1.44M, 3: format 720K"}
+]

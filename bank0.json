@@ -383,7 +383,7 @@
         "type": "data",
         "page": "0",
         "logical": "ff0c",
-        "size": "5c",
+        "size": "5d",
         "data": { "type": "string", "elements_per_line": 25 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },

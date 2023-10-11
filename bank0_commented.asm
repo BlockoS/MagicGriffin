@@ -93,7 +93,7 @@ put_string:                             ; bank: $000 logical: $e45a
 print_string_raw:                       ; bank: $000 logical: $e468
           ldy     #$00
 @set_cursor:                            ; bank: $000 logical: $e46a
-          lda     #$00                          ; Set VRAM write address.
+          lda     #$00                  ; set VRAM write address.
           sta     video_reg
           lda     [_si], Y
           sta     video_data_l
@@ -101,16 +101,16 @@ print_string_raw:                       ; bank: $000 logical: $e468
           lda     [_si], Y
           sta     video_data_h
           iny     
-          lda     #$02                          ; Set BAT.
+          lda     #$02                  ; set BAT.
           sta     video_reg
 @put_char:                              ; bank: $000 logical: $e480
-          lda     [_si], Y                      ; Stop if the character is '\0'. 
+          lda     [_si], Y              ; stop if the character is '\0'.
           beq     @end
           iny     
-          cmp     #$ff                          ; $ff means that the string will continue somewhere else.
-          beq     @set_cursor                   ; The next 2 bytes will be the BAT address where the next part will be printed.
+          cmp     #$ff                  ; $ff means that the string will continue somewhere else.
+          beq     @set_cursor           ; the next 2 bytes will be the BAT address where the next part will be printed.
           sta     video_data_l
-          lda     #$11                          ; The font tiles are stored at $1000 in VRAM, and will  use palette #1.  
+          lda     #$11                  ; the font tiles are stored at $1000 in VRAM, and will  use palette #1.
           sta     video_data_h
           bne     @put_char
 @end:                                   ; bank: $000 logical: $e493
@@ -436,28 +436,26 @@ msg_file_err:                           ; bank: $000 logical: $ea44
 ;  Reset IRQ handler.
 ; -------------------------------------------------------------------------------
 irq_reset:                              ; bank: $000 logical: $eb00
-          sei                                       ; disable interrupts
-          cld                                       ; clear decimal flag
-          csl                                       ; switch cpu to low speed mode
+          sei                           ; disable interrupts
+          cld                           ; clear decimal flag
+          csl                           ; switch cpu to low speed mode
           lda     #$f8
-          tam     #$00                              ; mpr 0 = RAM 
+          tam     #$00                  ; mpr 0 = RAM
           lda     #$f8
-          tam     #$01                              ; mpr 1 = RAM
+          tam     #$01                  ; mpr 1 = RAM
           lda     #$ff
-          tam     #$02                              ; mpr 2 = I/O
+          tam     #$02                  ; mpr 2 = I/O
           lda     #$01
-          tam     #$06                              ; mpr 6 = 
+          tam     #$06                  ; mpr 6 = 
           lda     #$02
-          tam     #$05                              ; mpr 5 = 
+          tam     #$05                  ; mpr 5 = 
           lda     #$03
-          tam     #$04                              ; mpr 4 = 
-
-                                                    ; mpr 7 = 1st ROM bank (by default)
+          tam     #$04                  ; mpr 4 = 
+                                        ; mpr 7 = 1st ROM bank (by default)
           ldx     #$ff
           stx     stack_pointer
-          txs                                       ; reset stack pointer
+          txs     
           jsr     unknown_f006
-
           ldy     #$00
 @ramcode_init.0:                        ; bank: $000 logical: $eb26
           lda     ramcode+$000, Y
@@ -587,7 +585,7 @@ menu_update:                            ; bank: $000 logical: $ec15
 @loop:                                  ; bank: $000 logical: $ec1d
           bit     disk_status
           bpl     @no_disk
-              jsr     read_sector
+          jsr     read_sector
 @no_disk:                               ; bank: $000 logical: $ec25
           jsr     read_joypad
           lda     <joypad
@@ -648,8 +646,8 @@ lec5c_00:                               ; bank: $000 logical: $ec5c
 ;   $0120-$0129: LSB od the BAT address.
 ; -------------------------------------------------------------------------------
 compute_cursor_bat_addr:                ; bank: $000 logical: $ec7e
-          txa                                   ; As the BAT is 32 by 32 the address is computed this way:
-          asl     A                             ; addr = (X & 0x1f)+ Y*32
+          txa                           ; as the BAT is 32 by 32 the address is computed this way:
+          asl     A                     ; addr = (X & 0x1f)+ Y*32
           asl     A
           asl     A
           sta     $0100
@@ -659,13 +657,13 @@ compute_cursor_bat_addr:                ; bank: $000 logical: $ec7e
           lsr     A
           ror     $0100
           lsr     A
-          ror     $0100                         ; $1000 now contains the LSB of the BAT address.
-          sta     $0120                         ; $1200 its MSB.
+          ror     $0100                 ; $1000 now contains the LSB of the BAT address.
+          sta     $0120                 ; $1200 its MSB.
           ldy     #$00
-@next_row:                                      ; We compute the offset for the next 8 menu line.
-          clc     
+@next_row:                              ; bank: $000 logical: $ec97
+          clc                           ; we compute the offset for the next 8 menu line.
           lda     $0100, Y
-          adc     #$40                          ; Jumps 2 lines.
+          adc     #$40                  ; jumps 2 lines.
           sta     $0101, Y
           lda     $0120, Y
           adc     #$00
