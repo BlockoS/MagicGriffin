@@ -5,6 +5,55 @@
 	{ "logical":"e485", "page":"00", "text": "$ff means that the string will continue somewhere else." },
 	{ "logical":"e487", "page":"00", "text": "the next 2 bytes will be the BAT address where the next part will be printed." },
 	{ "logical":"e48c", "page":"00", "text": "the font tiles are stored at $1000 in VRAM, and will  use palette #1." },
+	
+	{ "logical":"e5c4", "page":"00", "text": "set BAT address" },
+	{ "logical":"e5d8", "page":"00", "text": "print hundred" },
+	{ "logical":"e5e5", "page":"00", "text": "print ten" },
+	{ "logical":"e5f2", "page":"00", "text": "print unit" },
+	{ "logical":"e5ff", "page":"00", "text": "decrement number" },
+
+	{ "logical":"e66b", "page":"00", "text": "" },
+	{ "logical":"e676", "page":"00", "text": "" },
+	{ "logical":"e684", "page":"00", "text": "" },
+	{ "logical":"e693", "page":"00", "text": "" },
+	{ "logical":"e6a1", "page":"00", "text": "" },
+	{ "logical":"e6af", "page":"00", "text": "" },
+	{ "logical":"e6bd", "page":"00", "text": "" },
+	{ "logical":"e6c7", "page":"00", "text": "" },
+	{ "logical":"e6d5", "page":"00", "text": "" },
+
+	{ "logical":"e70a", "page":"00", "text": "" },
+	{ "logical":"e71f", "page":"00", "text": "" },
+	{ "logical":"e734", "page":"00", "text": "" },
+	{ "logical":"e749", "page":"00", "text": "" },
+
+	{ "logical":"e768", "page":"00", "text": "" },
+
+	{ "logical":"e7a4", "page":"00", "text": "" },
+
+	{ "logical":"e7c3", "page":"00", "text": "" },
+
+	{ "logical":"e7e2", "page":"00", "text": "" },
+	{ "logical":"e7f3", "page":"00", "text": "" },
+	{ "logical":"e800", "page":"00", "text": "" },
+
+	{ "logical":"e896", "page":"00", "text": "" },
+	{ "logical":"e8ab", "page":"00", "text": "" },
+	{ "logical":"e8c0", "page":"00", "text": "" },
+	{ "logical":"e8d0", "page":"00", "text": "" },
+	{ "logical":"e8e4", "page":"00", "text": "" },
+	{ "logical":"e8f8", "page":"00", "text": "" },
+
+	{ "logical":"e91e", "page":"00", "text": "" },
+	{ "logical":"e92b", "page":"00", "text": "" },
+	{ "logical":"e939", "page":"00", "text": "" },
+	{ "logical":"e946", "page":"00", "text": "" },
+	{ "logical":"e953", "page":"00", "text": "" },
+	{ "logical":"e95e", "page":"00", "text": "" },
+
+
+	{ "logical":"eb98", "page":"00", "text": "setup VDC and VCE." },
+	
 	{ "logical":"eb00", "page":"00", "text": "disable interrupts" },
 	{ "logical":"eb01", "page":"00", "text": "clear decimal flag" },
 	{ "logical":"eb02", "page":"00", "text": "switch cpu to low speed mode" },
@@ -18,6 +67,8 @@
 			"mpr 7 = 1st ROM bank (by default)"
 		]
 	},
+	{ "logical":"eb20", "page":"00", "text": "reset stack pointer." },
+	{ "logical":"eb26", "page":"00", "text": "copy ram code from rom to bss." },
 	{ "logical":"ec7e", "page":"00", "text": "as the BAT is 32 by 32 the address is computed this way:" },
 	{ "logical":"ec7f", "page":"00", "text": "addr = (X & 0x1f)+ Y*32" },
 	{ "logical":"ec8f", "page":"00", "text": "$1000 now contains the LSB of the BAT address." },
@@ -29,5 +80,8 @@
 	{ "logical":"f011", "page":"00", "text": "bit 6 = 0 -> data transfer from host to controller" },
 	{ "logical":"f01a", "page":"00", "text": "bit 7 = 1 -> ready for host to send or receive data" },
 	{ "logical":"f01c", "page":"00", "text": "bit 6 = 1 -> data transfer from controller to host" },
-	{ "logical":"f6af", "page":"00", "text": "2: format 1.44M, 3: format 720K"}
+	{ "logical":"f6af", "page":"00", "text": "2: format 1.44M, 3: format 720K"},
+
+	{ "logical":"ff25", "page":"00", "text": "" },
+	{ "logical":"ff4d", "page":"00", "text": "" }
 ]

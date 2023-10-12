@@ -5,8 +5,28 @@
         "page": "0",
         "logical": "0800",
         "offset": "0000",
-        "size": "500",
+        "size": "24d",
+        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "la4d": {
+        "filename": "ramcode.asm",
+        "type": "data",
+        "page": "0",
+        "logical": "0a4d",
+        "offset": "024d",
+        "size": "105",
+        "data": { "type": "hex", "element_size": 1, "elements_per_line": 8 },
+        "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "l0b52": {
+        "filename": "ramcode.asm",
+        "type": "code",
+        "page": "0",
+        "logical": "0b52",
+        "offset": "0352",
+        "size": "1ae",
         "mpr": ["00", "f8", "ff", "00", "03", "02", "01", "00"]
     }
+
 }
 

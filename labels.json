@@ -8,8 +8,43 @@
     { "name":"@load_1bpp_tile", "logical":"e57b", "page":"00"},
     { "name":"@plane_01", "logical":"e57d", "page":"00"},
     { "name":"@plane_23", "logical":"e58f", "page":"00"},
+    { "name":"@hundred", "logical":"e5a8", "page":"00"},
+    { "name":"@ten", "logical":"e5b4", "page":"00"},
+    { "name":"@unit", "logical":"e5c0", "page":"00"},
+
+    { "name":"print_dec_base10", "logical":"e5c4", "page":"00",  "description": [
+            "-------------------------------------------------------------------------------",
+            " Print a base 10 number and decrement it.",
+            " Parameters:",
+            "    $0018: unit.",
+            "    $0019: ten.",
+            "    $001a: hundred.",
+            "-------------------------------------------------------------------------------"
+        ]
+    },
+    { "name":"@end", "logical":"e616", "page":"00"},
+
     { "name":"main_menu.callbacks", "logical":"e623", "page":"00"},
     { "name":"unknown_menu.callbacks", "logical":"e62f", "page":"00"},
+
+    { "name":"utility_menu", "logical":"e6e2", "page":"00"},
+    { "name":"reserved", "logical":"e6f1", "page":"00"},
+    { "name":"logo", "logical":"e6fe", "page":"00"},
+    { "name":"run_file", "logical":"e75d", "page":"00"},
+    { "name":"run_ic_card", "logical":"e779", "page":"00"},
+    { "name":"save_ic_card", "logical":"e787", "page":"00"},
+    { "name":"rename_file", "logical":"e796", "page":"00"},
+    { "name":"delete_file", "logical":"e7b5", "page":"00"},
+    { "name":"format_disk", "logical":"e7d4", "page":"00"},
+    { "name":"loading", "logical":"e80d", "page":"00"},
+    { "name":"saving", "logical":"e821", "page":"00"},
+    { "name":"renaming", "logical":"e835", "page":"00"},
+    { "name":"deleting", "logical":"e849", "page":"00"},
+    { "name":"formatting", "logical":"e85d", "page":"00"},
+    { "name":"one_mega_card", "logical":"e871", "page":"00"},
+    { "name":"new_name", "logical":"e87b", "page":"00"},
+    { "name":"file_list", "logical":"e911", "page":"00"},
+
     { "name":"irq_reset", "logical":"eb00", "page":"00"},
     { "name":"@ramcode_init.0", "logical":"eb26", "page":"00"},
     { "name":"@ramcode_init.1", "logical":"eb6f", "page":"00"},

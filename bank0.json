@@ -85,7 +85,7 @@
             "-------------------------------------------------------------------------------",
             " Read joypads.",
             " Return:",
-            "    joypad - Joypad states.",
+            "    joypad: Joypad states.",
             "-------------------------------------------------------------------------------"
         ],
         "filename": "bank0.asm",
@@ -117,7 +117,7 @@
             "-------------------------------------------------------------------------------",
             " Wait for joypad.",
             " Return:",
-            "    joypad - Joypad states.",
+            "    joypad: Joypad states.",
             "-------------------------------------------------------------------------------"
         ],
         "filename": "bank0.asm",
@@ -148,6 +148,13 @@
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "video_load_1bpp_32": {
+        "description": [
+            "-------------------------------------------------------------------------------",
+            " Copy 1bpp tiles to VRAM.",
+            " Parameters:",
+            "    _si: 1bpp tiles ROM address.",
+            "-------------------------------------------------------------------------------"
+        ],
         "filename": "bank0.asm",
         "type": "code",
         "page": "0",
@@ -155,7 +162,18 @@
         "size": "24",
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
-    "unknown_e59d": {
+    "base10": {
+        "description": [
+            "-------------------------------------------------------------------------------",
+            " Decompose a number to base 10.",
+            " Parameters:",
+            "    A: Number to be converted.",
+            " Return:",
+            "    $0018: unit.",
+            "    $0019: ten.",
+            "    $001a: hundred.",
+            "-------------------------------------------------------------------------------"
+        ],
         "filename": "bank0.asm",
         "type": "code",
         "page": "0",
@@ -187,7 +205,7 @@
         "page": "0",
         "logical": "e61f",
         "size": "10",
-        "data": { "type": "hex", "element_size": 2, "elements_per_line": 1 },
+        "data": { "type": "jumptable", "elements_per_line": 1 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "unknown_data": {
@@ -205,16 +223,16 @@
         "page": "0",
         "logical": "e633",
         "size": "24",
-        "data": { "type": "hex", "element_size": 2, "elements_per_line": 1 },
+        "data": { "type": "jumptable", "elements_per_line": 1 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
-    "strings": {
+    "main_screen": {
         "filename": "bank0.asm",
         "type": "data",
         "page": "0",
         "logical": "e657",
         "size": "312",
-        "data": { "type": "string", "elements_per_line": 16 },
+        "data": { "type": "string", "elements_per_line": 32 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "message_pointer_table": {
@@ -223,7 +241,7 @@
         "page": "0",
         "logical": "e969",
         "size": "18",
-        "data": { "type": "hex", "element_size":2, "elements_per_line": 1 },
+        "data": { "type": "jumptable", "elements_per_line": 1 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "message": {
@@ -249,6 +267,11 @@
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "main": {
+        "description": [
+            "-------------------------------------------------------------------------------",
+            " Main entry point.",
+            "-------------------------------------------------------------------------------"
+        ],
         "filename": "bank0.asm",
         "type": "code",
         "page": "0",
@@ -321,25 +344,40 @@
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     
+    "unknown_f751": {
+        "filename": "bank0.asm",
+        "type": "code",
+        "page": "0",
+        "logical": "f751",
+        "size": "46",
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+
+    "unknown_f797": {
+        "filename": "bank0.asm",
+        "type": "data",
+        "page": "0",
+        "logical": "f797",
+        "size": "8",
+        "data": { "type": "hex", "element_size": 1, "elements_per_line": 8 },
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+
+    "unknown_f79f": {
+        "filename": "bank0.asm",
+        "type": "data",
+        "page": "0",
+        "logical": "f79f",
+        "size": "20",
+        "data": { "type": "hex", "element_size": 1, "elements_per_line": 8 },
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+
     "menu.run_file": {
         "filename": "bank0.asm",
         "type": "code",
         "page": "0",
         "logical": "f7f3",
-        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "menu.run_ic_card": {
-        "filename": "bank0.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "f8a2",
-        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
-    },
-    "menu.save_ic_card": {
-        "filename": "bank0.asm",
-        "type": "code",
-        "page": "0",
-        "logical": "f8a8",
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "menu.rename_file": {
@@ -363,7 +401,46 @@
         "logical": "f86f",
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
-
+    "menu.run_ic_card": {
+        "filename": "bank0.asm",
+        "type": "code",
+        "page": "0",
+        "logical": "f8a2",
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "menu.save_ic_card": {
+        "filename": "bank0.asm",
+        "type": "code",
+        "page": "0",
+        "logical": "f8a8",
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "unknown_f8fb": {
+        "filename": "bank0.asm",
+        "type": "data",
+        "page": "0",
+        "logical": "f8fb",
+        "size": "8",
+        "data": { "type": "hex", "element_size": 1, "elements_per_line": 8 },
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "unknown_f903": {
+        "filename": "bank0.asm",
+        "type": "data",
+        "page": "0",
+        "logical": "f903",
+        "size": "10",
+        "data": { "type": "hex", "element_size": 1, "elements_per_line": 8 },
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
+    "unknown_f913": {
+        "filename": "bank0.asm",
+        "type": "code",
+        "page": "0",
+        "size": "1ac",
+        "logical": "f913",
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
     "unknown_fabf": {
         "filename": "bank0.asm",
         "type": "code",
@@ -378,13 +455,21 @@
         "logical": "face",
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
+    "unknown_faeb": {
+        "filename": "bank0.asm",
+        "type": "code",
+        "page": "0",
+        "logical": "faeb",
+        "size": "316",
+        "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
+    },
     "copyright": {
         "filename": "bank0.asm",
         "type": "data",
         "page": "0",
         "logical": "ff0c",
         "size": "5d",
-        "data": { "type": "string", "elements_per_line": 25 },
+        "data": { "type": "string", "elements_per_line": 64 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
     "irq_table": {
@@ -393,10 +478,9 @@
         "page": "0",
         "logical": "fff6",
         "size": "A",
-        "data": { "type": "hex", "element_size": 2, "elements_per_line": 1 },
+        "data": { "type": "jumptable", "elements_per_line": 1 },
         "mpr": ["f8", "f8", "ff", "00", "03", "02", "01", "00"]
     },
-    
     "ramcode": {
         "filename": "ramcode.bin",
         "type": "data",
